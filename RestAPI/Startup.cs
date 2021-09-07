@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Persistence;
 
 namespace RestAPI
 {
@@ -20,6 +21,7 @@ namespace RestAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddPersistence();
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "RestAPI", Version = "v1" }); });
         }
 
