@@ -29,6 +29,8 @@ namespace RestAPI
             
             services.AddPersistence();
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "RestAPI", Version = "v1" }); });
+
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,6 +46,11 @@ namespace RestAPI
             app.UseHttpsRedirection();
 
             app.UseRouting();
+            
+            app.UseCors(x => x
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowAnyOrigin());
             
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
