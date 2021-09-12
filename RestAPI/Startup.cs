@@ -27,7 +27,7 @@ namespace RestAPI
                 options.JsonSerializerOptions.IgnoreNullValues = true;
             });
             
-            services.AddPersistence();
+            services.AddPersistence(Configuration);
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "RestAPI", Version = "v1" }); });
 
             services.AddCors();
