@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Persistence;
 using RestAPI.Options;
+using RestAPI.SwaggerSettings;
 
 namespace RestAPI
 {
@@ -32,7 +33,11 @@ namespace RestAPI
             });
             
             services.AddPersistence(Configuration);
-            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "RestAPI", Version = "v1" }); });
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "RestAPI", Version = "v1" });
+                options.OperationFilter<AddHeaderParameter>();
+            });
 
             services.AddCors();
         }
