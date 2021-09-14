@@ -6,8 +6,10 @@ using Contracts.Enums;
 using Contracts.Models.RequestModels;
 using Contracts.Models.ResponseModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Persistence.Models.ReadModels;
 using Persistence.Repositories;
+using RestAPI.Options;
 
 namespace RestAPI.Controllers
 {
@@ -16,18 +18,29 @@ namespace RestAPI.Controllers
     public class TodosController : ControllerBase
     {
         private readonly ITodosRepository _todosRepository;
-
-        public TodosController(ITodosRepository todosRepository)
+        private readonly AppSettings _appSettingsSettings;
+        
+        public TodosController(ITodosRepository todosRepository, IOptions<AppSettings> favQSettings)
         {
             _todosRepository = todosRepository;
+            _appSettingsSettings = favQSettings.Value;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<TodosItemResponse>> GetAll()
+        public async Task<ActionResult<IEnumerable<TodosItemResponse>>> GetAll()
         {
+            var releaseDate = _appSettingsSettings.ReleaseDate;
+
+            var currentDate = DateTime.Now;
+            
+            if (releaseDate <= new DateTime(currentDate.Year, currentDate.Month, currentDate.Day))
+            {
+                return BadRequest("Feature not released");
+            }
+            
             var todos = await _todosRepository.GetAllAsync();
 
-            return todos.Select(todo => todo.MapToTodoItemResponse());
+            return new ActionResult<IEnumerable<TodosItemResponse>>(todos.Select(todo => todo.MapToTodoItemResponse()));
         }
 
         [HttpGet]

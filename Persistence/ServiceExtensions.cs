@@ -27,7 +27,7 @@ namespace Persistence
 
         private static IServiceCollection AddSqlClient(this IServiceCollection services, IConfiguration configuration)
         {
-            var connectionString = configuration.GetSection("ConnectionStrings")["SqlConnectionString"];
+            var connectionString = configuration.GetConnectionString("SqlConnectionString");
             
             return services.AddTransient<ISqlClient>(_ => new SqlClient(connectionString));
         }
