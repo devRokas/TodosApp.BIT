@@ -18,26 +18,17 @@ namespace RestAPI.Controllers
     public class TodosController : ControllerBase
     {
         private readonly ITodosRepository _todosRepository;
-        private readonly AppSettings _appSettingsSettings;
+        private readonly IUserRepository _userRepository;
         
-        public TodosController(ITodosRepository todosRepository, IOptions<AppSettings> favQSettings)
+        public TodosController(ITodosRepository todosRepository, IUserRepository userRepository)
         {
             _todosRepository = todosRepository;
-            _appSettingsSettings = favQSettings.Value;
+            _userRepository = userRepository;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TodosItemResponse>>> GetAll()
         {
-            var releaseDate = _appSettingsSettings.ReleaseDate;
-
-            var currentDate = DateTime.Now;
-            
-            if (releaseDate <= new DateTime(currentDate.Year, currentDate.Month, currentDate.Day))
-            {
-                return BadRequest("Feature not released");
-            }
-            
             var todos = await _todosRepository.GetAllAsync();
 
             return new ActionResult<IEnumerable<TodosItemResponse>>(todos.Select(todo => todo.MapToTodoItemResponse()));
@@ -70,7 +61,12 @@ namespace RestAPI.Controllers
                 DateCreated = DateTime.Now
             };
 
-            await _todosRepository.SaveOrUpdateAsync(todoItemReadModel);
+            var rowsAffected = await _todosRepository.SaveOrUpdateAsync(todoItemReadModel);
+
+            if (rowsAffected > 1)
+            {
+                throw new Exception("Something went wrong");
+            }
 
             return CreatedAtAction(nameof(Get), new { todoItemReadModel.Id }, todoItemReadModel.MapToTodoItemResponse());
         }
