@@ -9,7 +9,5 @@ namespace Contracts.Models.RequestModels
 
         [Required]
         public string Password { get; set; }
-        
-        
     }
 }

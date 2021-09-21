@@ -5,7 +5,7 @@ using Persistence.Models.ReadModels;
 
 namespace Persistence.Repositories
 {
-    class TodosRepository : ITodosRepository
+    public class TodosRepository : ITodosRepository
     {
         private const string TableName = "Todos";
         private readonly ISqlClient _sqlClient;
@@ -15,29 +15,37 @@ namespace Persistence.Repositories
             _sqlClient = sqlClient;
         }
 
-        public Task<IEnumerable<TodoItemReadModel>> GetAllAsync()
+        public Task<IEnumerable<TodoItemReadModel>> GetAllAsync(Guid userId)
         {
-            var sql = $"SELECT * FROM {TableName}";
+            var sql = $"SELECT * FROM {TableName} WHERE UserId = @UserId";
             
-            return _sqlClient.QueryAsync<TodoItemReadModel>(sql);
+            return _sqlClient.QueryAsync<TodoItemReadModel>(sql, new
+            {
+                UserId = userId
+            });
         }
 
-        public Task<TodoItemReadModel> GetAsync(Guid id)
+        public Task<TodoItemReadModel> GetAsync(Guid id, Guid userId)
         {
-            var sql = $"SELECT * FROM {TableName} WHERE Id = @Id";
+            var sql = $"SELECT * FROM {TableName} WHERE Id = @Id AND UserId = @UserId";
             
-            return _sqlClient.QuerySingleOrDefaultAsync<TodoItemReadModel>(sql, new {Id = id});
+            return _sqlClient.QuerySingleOrDefaultAsync<TodoItemReadModel>(sql, new
+            {
+                Id = id,
+                userId = userId
+            });
         }
 
         public Task<int> SaveOrUpdateAsync(TodoItemReadModel model)
         {
-            var sql = @$"INSERT INTO {TableName} (Id, Title, Description, Difficulty, DateCreated, IsDone) 
-                        VALUES (@Id, @Title, @Description, @Difficulty, @DateCreated, @IsDone)
+            var sql = @$"INSERT INTO {TableName} (Id, UserId, Title, Description, Difficulty, DateCreated, IsDone) 
+                        VALUES (@Id, @UserId, @Title, @Description, @Difficulty, @DateCreated, @IsDone)
                         ON DUPLICATE KEY UPDATE Title = @Title, Description = @Description, Difficulty = @Difficulty, IsDone = @IsDone";
 
             return _sqlClient.ExecuteAsync(sql, new
             {
                 model.Id,
+                model.UserId,
                 model.Title,
                 model.Description,
                 Difficulty = model.Difficulty.ToString(),

@@ -10,6 +10,7 @@ namespace RestAPI
             return new TodosItemResponse
             {
                 Id = model.Id,
+                UserId = model.UserId,
                 Title = model.Title,
                 Description = model.Description,
                 Difficulty = model.Difficulty,

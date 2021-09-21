@@ -7,9 +7,9 @@ namespace Persistence.Repositories
 {
     public interface ITodosRepository
     {
-        Task<IEnumerable<TodoItemReadModel>> GetAllAsync();
+        Task<IEnumerable<TodoItemReadModel>> GetAllAsync(Guid userId);
 
-        Task<TodoItemReadModel> GetAsync(Guid id);
+        Task<TodoItemReadModel> GetAsync(Guid id, Guid userId);
         
         Task<int> SaveOrUpdateAsync(TodoItemReadModel model);
 

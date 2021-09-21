@@ -5,7 +5,7 @@ using MySql.Data.MySqlClient;
 
 namespace Persistence
 {
-    class SqlClient : ISqlClient
+    public class SqlClient : ISqlClient
     {
         private readonly string _connectionString;
 

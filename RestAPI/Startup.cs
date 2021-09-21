@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Persistence;
 using RestAPI.Options;
+using RestAPI.Services;
 using RestAPI.SwaggerSettings;
 
 namespace RestAPI
@@ -23,8 +24,7 @@ namespace RestAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var appSettingsSection = Configuration.GetSection("AppSettings");
-            services.Configure<AppSettings>(appSettingsSection);
+            services.Configure<ApiKeySettings>(Configuration.GetSection("ApiKeySettings"));
             
             services.AddControllers().AddJsonOptions(options =>
             {
@@ -40,6 +40,8 @@ namespace RestAPI
             });
 
             services.AddCors();
+
+            services.AddSingleton<IApikeyService, ApikeyService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
