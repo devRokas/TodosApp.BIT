@@ -99,9 +99,26 @@ namespace RestAPI.Services
             });
         }
 
-        public Task<ApiKey> UpdateApiKeyState(Guid id, bool state)
+        public async Task<ApiKey> UpdateApiKeyState(Guid id, bool newState)
         {
-            throw new NotImplementedException();
+            var apiKey = await _apiKeysRepository.GetByApiKeyIdAsync(id);
+        
+            if (apiKey is null)
+            {
+                throw new BadHttpRequestException($"Api key with Id: '{id}' does not exists", 404);
+            }
+        
+            await _apiKeysRepository.UpdateIsActive(id, newState);
+
+            return new ApiKey
+            {
+                Id = apiKey.Id,
+                Key = apiKey.ApiKey,
+                UserId = apiKey.UserId,
+                IsActive = newState,
+                DateCreated = apiKey.DateCreated,
+                ExpirationDate = apiKey.ExpirationDate
+            };;
         }
     }
 }

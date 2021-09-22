@@ -58,42 +58,60 @@ namespace RestAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ApiKeyResponse>>> GetAllKeys(string username, string password)
         {
-            var apiKeys = await _apikeyService.GetAllApiKeys(username, password);
-            
-            return Ok(apiKeys.Select(apiKey => new ApiKeyResponse
+            try
             {
-                Id = apiKey.Id,
-                ApiKey = apiKey.Key,
-                UserId = apiKey.UserId,
-                IsActive = apiKey.IsActive,
-                DateCreated = apiKey.DateCreated,
-                ExpirationDate = apiKey.ExpirationDate
-            }));
+                var apiKeys = await _apikeyService.GetAllApiKeys(username, password);
+            
+                return Ok(apiKeys.Select(apiKey => new ApiKeyResponse
+                {
+                    Id = apiKey.Id,
+                    ApiKey = apiKey.Key,
+                    UserId = apiKey.UserId,
+                    IsActive = apiKey.IsActive,
+                    DateCreated = apiKey.DateCreated,
+                    ExpirationDate = apiKey.ExpirationDate
+                }));
+            }
+            catch (BadHttpRequestException exception)
+            {
+                switch (exception.StatusCode)
+                {
+                    case 404:
+                        return NotFound(exception.Message);
+                    case 400:
+                        return BadRequest(exception.Message);
+                    default: throw;
+                }
+            }
         }
         
-        //
-        // [HttpPut]
-        // [Route("{id}/isActive")]
-        // public async Task<ActionResult<ApiKeyResponse>> UpdateKeyState(Guid id, UpdateKeyStateRequest request)
-        // {
-        //     var apiKey = await _apiKeysRepository.GetByApiKeyIdAsync(id);
-        //
-        //     if (apiKey is null)
-        //     {
-        //         return NotFound($"Api key with Id: '{id}' does not exists");
-        //     }
-        //
-        //     await _apiKeysRepository.UpdateIsActive(id, request.IsActive);
-        //
-        //     return new ApiKeyResponse
-        //     {
-        //         Id = apiKey.Id,
-        //         ApiKey = apiKey.ApiKey,
-        //         UserId = apiKey.UserId,
-        //         IsActive = request.IsActive,
-        //         DateCreated = apiKey.DateCreated,
-        //         ExpirationDate = apiKey.ExpirationDate
-        //     };
-        // }
+        [HttpPut]
+        [Route("{id}/isActive")]
+        public async Task<ActionResult<ApiKeyResponse>> UpdateKeyState(Guid id, UpdateKeyStateRequest request)
+        {
+            try
+            {
+                var apiKey = await _apikeyService.UpdateApiKeyState(id, request.IsActive);
+        
+                return new ApiKeyResponse
+                {
+                    Id = apiKey.Id,
+                    ApiKey = apiKey.Key,
+                    UserId = apiKey.UserId,
+                    IsActive = request.IsActive,
+                    DateCreated = apiKey.DateCreated,
+                    ExpirationDate = apiKey.ExpirationDate
+                };
+            }
+            catch (BadHttpRequestException exception)
+            {
+                switch (exception.StatusCode)
+                {
+                    case 404:
+                        return NotFound(exception.Message);
+                    default: throw;
+                }
+            }
+        }
     }
 }

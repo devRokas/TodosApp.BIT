@@ -24,14 +24,14 @@ namespace RestAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<ApiKeySettings>(Configuration.GetSection("ApiKeySettings"));
-            
             services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 options.JsonSerializerOptions.IgnoreNullValues = true;
             });
             
+            services.Configure<ApiKeySettings>(Configuration.GetSection("ApiKeySettings"));
+
             services.AddPersistence(Configuration);
             services.AddSwaggerGen(options =>
             {
@@ -57,13 +57,16 @@ namespace RestAPI
             app.UseHttpsRedirection();
 
             app.UseRouting();
-            
+
             app.UseCors(x => x
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowAnyOrigin());
             
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
         }
     }
 }

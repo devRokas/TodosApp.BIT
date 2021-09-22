@@ -11,6 +11,6 @@ namespace RestAPI.Services
 
         Task<IEnumerable<ApiKey>> GetAllApiKeys(string username, string password);
 
-        Task<ApiKey> UpdateApiKeyState(Guid id, bool state);
+        Task<ApiKey> UpdateApiKeyState(Guid id, bool newState);
     }
 }
