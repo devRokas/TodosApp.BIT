@@ -29,7 +29,6 @@ namespace RestAPI.Services
         
         public async Task<ApiKey> CreateApiKey(string username, string password)
         {
-            const int apiKeyLimit = 3;
             var user = await _userRepository.GetAsync(username);
 
             if (user is null)
@@ -44,7 +43,7 @@ namespace RestAPI.Services
 
             var allKeys = await _apiKeysRepository.GetByUserIdAsync(user.Id);
 
-            if (apiKeyLimit < allKeys.Count() + 1)
+            if (_apiKeySettings.ApiKeyLimit < allKeys.Count() + 1)
             {
                 throw new BadHttpRequestException($"Api key limit is reached", 200);
             }

@@ -26,13 +26,13 @@ namespace RestAPI.Controllers
         }
         
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TodosItemResponse>>> GetAll()
+        public async Task<IEnumerable<TodosItemResponse>> GetAll()
         {
             var userId = (Guid) HttpContext.Items["userId"];
             
             var todos = await _todosRepository.GetAllAsync(userId);
 
-            return new ActionResult<IEnumerable<TodosItemResponse>>(todos.Select(todo => todo.MapToTodoItemResponse()));
+            return todos.Select(todo => todo.MapToTodoItemResponse());
         }
 
         [HttpGet]
