@@ -55,7 +55,7 @@ namespace RestAPI.Services
             var apiKey = new ApiKeyReadModel
             {
                 Id = Guid.NewGuid(),
-                ApiKey = Guid.NewGuid().ToString("N"),
+                Key = Guid.NewGuid().ToString("N"),
                 UserId = user.Id,
                 IsActive = true,
                 DateCreated = DateTime.Now,
@@ -67,7 +67,7 @@ namespace RestAPI.Services
             return new ApiKey
             {
                 Id = apiKey.Id,
-                Key = apiKey.ApiKey,
+                Key = apiKey.Key,
                 UserId = apiKey.UserId,
                 IsActive = apiKey.IsActive,
                 DateCreated = apiKey.DateCreated,
@@ -94,7 +94,7 @@ namespace RestAPI.Services
             return apiKeys.Select(apiKey => new ApiKey
             {
                 Id = apiKey.Id,
-                Key = apiKey.ApiKey,
+                Key = apiKey.Key,
                 UserId = apiKey.UserId,
                 IsActive = apiKey.IsActive,
                 DateCreated = apiKey.DateCreated,
@@ -116,13 +116,12 @@ namespace RestAPI.Services
             return new ApiKey
             {
                 Id = apiKey.Id,
-                Key = apiKey.ApiKey,
+                Key = apiKey.Key,
                 UserId = apiKey.UserId,
                 IsActive = newState,
                 DateCreated = apiKey.DateCreated,
                 ExpirationDate = apiKey.ExpirationDate
             };
-            ;
         }
     }
 }

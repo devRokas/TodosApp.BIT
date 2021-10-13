@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
+using AutoFixture.Xunit2;
 using Contracts.Enums;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -8,68 +10,49 @@ using Moq;
 using Persistence.Models.ReadModels;
 using Persistence.Repositories;
 using RestAPI.Controllers;
+using TestHelpers.Attributes;
 using Xunit;
 
 namespace RestAPI.UnitTests.Controllers
 {
     public class TodosController_Should
     {
-        private readonly Random _random = new Random();
+        private readonly Mock<ITodosRepository> _todosRepositoryMock = new Mock<ITodosRepository>();
+        private readonly Mock<IUserRepository> _usersRepositoryMock = new Mock<IUserRepository>();
+        private readonly Mock<HttpContext> _httpContextMock = new Mock<HttpContext>();
 
-        // UnitOfWork_StateUnderTest_ExpectedBehavior
-        [Fact]
-        public async Task GetAllTodoItems_When_GetAllIsCalled()
+        private readonly TodosController _sut;
+        
+        public TodosController_Should()
         {
-            // Arrange
-            var userId = Guid.NewGuid();
-
-            var usersRepositoryMock = new Mock<IUserRepository>();
-            var todosRepositoryMock = new Mock<ITodosRepository>();
-
-            var httpContextMock = new Mock<HttpContext>();
-
-            httpContextMock.SetupGet(x => x.Items["userId"]).Returns(userId);
-
-            var expectedItems = new List<TodoItemReadModel>
-            {
-                GenerateTodoItems(),
-                GenerateTodoItems(),
-                GenerateTodoItems()
-            };
-
-            expectedItems.ForEach(todoItem => todoItem.UserId = userId);
-
-            todosRepositoryMock.Setup(x => x.GetAllAsync(userId)).ReturnsAsync(expectedItems);
-
-            var sut = new TodosController(todosRepositoryMock.Object, usersRepositoryMock.Object)
+            _sut = new TodosController(_todosRepositoryMock.Object, _usersRepositoryMock.Object)
             {
                 ControllerContext =
                 {
-                    HttpContext = httpContextMock.Object
+                    HttpContext = _httpContextMock.Object
                 }
             };
-            
-            // Act
-            var result = await sut.GetAll();
-
-            // Assert
-            result.Should().BeEquivalentTo(expectedItems, options => options.ComparingByMembers<TodoItemReadModel>());
-            
-            todosRepositoryMock.Verify(x => x.GetAllAsync(userId), Times.Once);
         }
 
-        private TodoItemReadModel GenerateTodoItems()
+        [Theory, AutoData]
+        public async Task GetAllTodos_When_GetAll_Is_Called(Guid userId, List<TodoItemReadModel> todos)
         {
-            return new TodoItemReadModel
-            {
-                Id = Guid.NewGuid(),
-                UserId = Guid.NewGuid(),
-                Title = Guid.NewGuid().ToString(),
-                Description = Guid.NewGuid().ToString(),
-                Difficulty = (Difficulty)_random.Next(0, 4),
-                IsDone = false,
-                DateCreated = DateTime.Now
-            };
+            // Arrange
+            _todosRepositoryMock
+                .Setup(mock => mock.GetAllAsync(userId))
+                .ReturnsAsync(todos);
+
+            _httpContextMock
+                .SetupGet(mock => mock.Items["userId"])
+                .Returns(userId);
+            
+            // Act
+            var result = await _sut.GetAll();
+            
+            // Assert
+            result.Should().BeEquivalentTo(todos);
+            
+            _todosRepositoryMock.Verify(mock => mock.GetAllAsync(It.IsAny<Guid>()), Times.Once);
         }
     }
 }

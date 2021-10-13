@@ -6,10 +6,6 @@ using Contracts.Models.RequestModels;
 using Contracts.Models.ResponseModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Persistence.Models.ReadModels;
-using Persistence.Repositories;
-using RestAPI.Options;
 using RestAPI.Services;
 
 namespace RestAPI.Controllers

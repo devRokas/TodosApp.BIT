@@ -6,7 +6,7 @@ namespace Persistence.Models.ReadModels
     {
         public Guid Id { get; set; }
 
-        public string ApiKey { get; set; }
+        public string Key { get; set; }
 
         public Guid UserId { get; set; }
 

@@ -50,7 +50,15 @@ namespace Persistence.Repositories
         {
             var sql = $"INSERT INTO {TableName} (Id, ApiKey, UserId, IsActive, DateCreated, ExpirationDate) VALUES (@Id, @ApiKey, @UserId, @IsActive, @DateCreated, @ExpirationDate)";
 
-            return _sqlClient.ExecuteAsync(sql, model);
+            return _sqlClient.ExecuteAsync(sql, new
+            {
+                Id = model.Id,
+                ApiKey = model.Key,
+                UserId = model.UserId,
+                IsActive = model.IsActive,
+                DateCreated = model.DateCreated,
+                ExpirationDate = model.ExpirationDate
+            });
         }
 
         public Task<int> UpdateIsActive(Guid id, bool isActive)

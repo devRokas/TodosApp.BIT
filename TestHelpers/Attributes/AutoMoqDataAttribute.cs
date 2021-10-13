@@ -1,5 +1,6 @@
 using AutoFixture;
 using AutoFixture.AutoMoq;
+using AutoFixture.AutoMoq.WebApi;
 using AutoFixture.Xunit2;
 
 namespace TestHelpers.Attributes
